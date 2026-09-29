@@ -4,7 +4,7 @@
 # Submit:  qsub -v MODEL=./models/Qwen3.5-4B-UD-Q2_K_XL.gguf llama_server.qsub
 # Then:    cat llama_server.<jobid>.info     (host, port, tunnel cmd, URL)
 #
-# Optional env (pass with -v): MODEL, LLAMA_BIN, LLAMA_SERVER, CTX, NGL, ALIAS, EXTRA_ARGS
+# Optional env (pass with -v): MODEL, CUDA_MODULE, LLAMA_BIN, LLAMA_SERVER, CTX, NGL, ALIAS, EXTRA_ARGS
 
 #$ -N llama_server
 #$ -cwd
@@ -23,6 +23,9 @@ MODEL="${MODEL:-$WORKDIR/models/Qwen3.5-4B-UD-Q2_K_XL.gguf}"
 LLAMA_BIN="${LLAMA_BIN:-$WORKDIR/llama.cpp/build/bin}"
 export PATH="$LLAMA_BIN:$PATH"
 LLAMA_SERVER="${LLAMA_SERVER:-llama-server}"
+
+# llama-server needs libcudart.so.12 at runtime. Check versions: module avail cuda
+module load "${CUDA_MODULE:-cuda}"
 CTX="${CTX:-8192}"
 NGL="${NGL:-999}"
 ALIAS="${ALIAS:-$(basename "$MODEL" .gguf)}"
