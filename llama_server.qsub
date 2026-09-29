@@ -4,7 +4,7 @@
 # Submit:  qsub -v MODEL=./models/Qwen3.5-4B-UD-Q2_K_XL.gguf llama_server.qsub
 # Then:    cat llama_server.<jobid>.info     (host, port, tunnel cmd, URL)
 #
-# Optional env (pass with -v): MODEL, LLAMA_SERVER, CTX, NGL, ALIAS, EXTRA_ARGS
+# Optional env (pass with -v): MODEL, LLAMA_BIN, LLAMA_SERVER, CTX, NGL, ALIAS, EXTRA_ARGS
 
 #$ -N llama_server
 #$ -l h_rt=4:00:00
@@ -15,6 +15,8 @@
 #$ -o llama_server.$JOB_ID.log
 
 MODEL="${MODEL:-$HOME/Downloads/quantize-benchmarks/models/Qwen3.5-4B-UD-Q2_K_XL.gguf}"
+LLAMA_BIN="${LLAMA_BIN:-$HOME/llama.cpp/build/bin}"
+export PATH="$LLAMA_BIN:$PATH"
 LLAMA_SERVER="${LLAMA_SERVER:-llama-server}"
 CTX="${CTX:-8192}"
 NGL="${NGL:-999}"
