@@ -1,0 +1,56 @@
+#!/bin/bash -l
+# Run llama-server on an SCC L40 GPU node in the background (SGE batch job).
+#
+# Submit:  qsub -v MODEL=./models/Qwen3.5-4B-UD-Q2_K_XL.gguf llama_server.qsub
+# Then:    cat llama_server.<jobid>.info     (host, port, tunnel cmd, URL)
+#
+# Optional env (pass with -v): MODEL, LLAMA_SERVER, CTX, NGL, ALIAS, EXTRA_ARGS
+
+#$ -N llama_server
+#$ -l h_rt=12:00:00
+#$ -l gpus=1
+#$ -l gpu_type=L40
+#$ -pe omp 4
+#$ -j y
+#$ -o llama_server.$JOB_ID.log
+
+MODEL="${MODEL:-$HOME/Downloads/quantize-benchmarks/models/Qwen3.5-4B-UD-Q2_K_XL.gguf}"
+LLAMA_SERVER="${LLAMA_SERVER:-llama-server}"
+CTX="${CTX:-8192}"
+NGL="${NGL:-999}"
+ALIAS="${ALIAS:-$(basename "$MODEL" .gguf)}"
+
+# Pick a free port on this node (SCC node gets arbitrary port range, so probe).
+PORT=$(python3 - <<'EOF'
+import socket
+s = socket.socket()
+s.bind(("", 0))
+print(s.getsockname()[1])
+s.close()
+EOF
+)
+
+HOST=$(hostname -f)
+INFO="llama_server.${JOB_ID}.info"
+
+cat > "$INFO" <<EOF
+host:   $HOST
+port:   $PORT
+url:    http://$HOST:$PORT/v1
+tunnel: ssh -N -L $PORT:$HOST:$PORT <user>@scc1.bu.edu
+local:  http://localhost:$PORT/v1   (after tunnel)
+model:  $MODEL (alias: $ALIAS)
+EOF
+cat "$INFO"
+
+nvidia-smi -L
+
+exec "$LLAMA_SERVER" \
+  --model "$MODEL" \
+  --alias "$ALIAS" \
+  --host 0.0.0.0 \
+  --port "$PORT" \
+  --n-gpu-layers "$NGL" \
+  --ctx-size "$CTX" \
+  --jinja \
+  $EXTRA_ARGS
