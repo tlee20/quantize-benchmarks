@@ -9,7 +9,7 @@
 #$ -N llama_server
 #$ -l h_rt=4:00:00
 #$ -l gpus=1
-#$ -l gpu_type=L40
+#$ -l gpu_type=L40S
 #$ -pe omp 4
 #$ -j y
 #$ -o llama_server.$JOB_ID.log
