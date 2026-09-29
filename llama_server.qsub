@@ -7,6 +7,7 @@
 # Optional env (pass with -v): MODEL, LLAMA_BIN, LLAMA_SERVER, CTX, NGL, ALIAS, EXTRA_ARGS
 
 #$ -N llama_server
+#$ -cwd
 #$ -l h_rt=4:00:00
 #$ -l gpus=1
 #$ -l gpu_type=L40S
@@ -14,8 +15,12 @@
 #$ -j y
 #$ -o llama_server.$JOB_ID.log
 
-MODEL="${MODEL:-$HOME/Downloads/quantize-benchmarks/models/Qwen3.5-4B-UD-Q2_K_XL.gguf}"
-LLAMA_BIN="${LLAMA_BIN:-$HOME/llama.cpp/build/bin}"
+# Paths default to the directory qsub was run from.
+WORKDIR="${SGE_O_WORKDIR:-$PWD}"
+cd "$WORKDIR"
+
+MODEL="${MODEL:-$WORKDIR/models/Qwen3.5-4B-UD-Q2_K_XL.gguf}"
+LLAMA_BIN="${LLAMA_BIN:-$WORKDIR/llama.cpp/build/bin}"
 export PATH="$LLAMA_BIN:$PATH"
 LLAMA_SERVER="${LLAMA_SERVER:-llama-server}"
 CTX="${CTX:-8192}"
