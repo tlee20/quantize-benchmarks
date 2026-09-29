@@ -7,7 +7,7 @@
 # Optional env (pass with -v): MODEL, LLAMA_SERVER, CTX, NGL, ALIAS, EXTRA_ARGS
 
 #$ -N llama_server
-#$ -l h_rt=12:00:00
+#$ -l h_rt=4:00:00
 #$ -l gpus=1
 #$ -l gpu_type=L40
 #$ -pe omp 4
