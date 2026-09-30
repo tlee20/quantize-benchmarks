@@ -25,10 +25,10 @@ export PATH="$LLAMA_BIN:$PATH"
 LLAMA_SERVER="${LLAMA_SERVER:-llama-server}"
 
 # llama-server needs libcudart.so.12 at runtime. Check versions: module avail cuda
-module load "${CUDA_MODULE:-cuda}"
+module load "${CUDA_MODULE:-cuda/12.2}"
 
 # System libstdc++ is too old (needs GLIBCXX_3.4.30, GCC >= 12). Load the GCC used to build llama.cpp.
-module load "${GCC_MODULE:-gcc}"
+module load "${GCC_MODULE:-gcc/12.2.0}"
 CTX="${CTX:-8192}"
 NGL="${NGL:-999}"
 ALIAS="${ALIAS:-$(basename "$MODEL" .gguf)}"
